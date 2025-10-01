@@ -1,10 +1,12 @@
+import streamlit as st
+import requests
+import pandas as pd
+from io import BytesIO
+
+
 TOOL_NAME = "WooCommerce All Products Downloader"
 
 def run():
-    import streamlit as st
-    import requests
-    import pandas as pd
-    from io import BytesIO
 
     st.set_page_config(page_title="WooCommerce All Products", layout="wide")
     st.title("Fetch All WooCommerce Products with Attributes")
