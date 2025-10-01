@@ -12,7 +12,8 @@ def run():
     st.set_page_config(page_title="Daily Orders", layout="wide")
 
     # WooCommerce API credentials (from Streamlit secrets)
-    WC_API_URL = st.secrets.get("WC_API_URL")
+    # WC_API_URL is now set to the correct REST endpoint base.
+    WC_API_URL = st.secrets.get("WC_API_URL", "https://sustenance.co.in/wp-json/wc/v3")
     WC_CONSUMER_KEY = st.secrets.get("WC_CONSUMER_KEY")
     WC_CONSUMER_SECRET = st.secrets.get("WC_CONSUMER_SECRET")
 
@@ -24,7 +25,7 @@ def run():
 
         while True:
             response = requests.get(
-                f"{WC_API_URL}/wp-json/wc/v3/orders",
+                f"{WC_API_URL}/orders",
                 params={
                     "after": f"{start_date}T00:00:00",
                     "before": f"{end_date}T23:59:59",
