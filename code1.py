@@ -12,7 +12,6 @@ def run():
     st.set_page_config(page_title="Daily Orders", layout="wide")
 
     # WooCommerce API credentials (from Streamlit secrets)
-    # WC_API_URL is now set to the correct REST endpoint base.
     WC_API_URL = st.secrets.get("WC_API_URL", "https://sustenance.co.in/wp-json/wc/v3")
     WC_CONSUMER_KEY = st.secrets.get("WC_CONSUMER_KEY")
     WC_CONSUMER_SECRET = st.secrets.get("WC_CONSUMER_SECRET")
@@ -100,14 +99,11 @@ def run():
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             # --- Sheet 1: Orders ---
             sheet1_df = df[["Order ID", "Name", "Items Ordered", "Mobile Number", "Shipping Address", "Order Value", "Order Status", "Total Items"]].copy()
-            # <<< ONLY CHANGE: rename headers for Excel output >>>
             sheet1_df.rename(columns={
                 "Order ID": "order #",
                 "Name": "name",
                 "Order Value": "Order Total"
             }, inplace=True)
-            # <<< end change >>>
-            # <<< ADD S.No column at the start >>>
             sheet1_df.insert(0, "S.No", range(1, len(sheet1_df)+1))
             sheet1_df.to_excel(writer, index=False, sheet_name='Orders')
             workbook = writer.book
@@ -123,15 +119,20 @@ def run():
             for row_num in range(1, len(sheet1_df) + 1):
                 worksheet1.set_row(row_num, 20)
 
-            # --- Sheet 2: Item Summary ---
+            # --- Sheet 2: Item Summary (UPDATED) ---
             items_list = []
             for line_items in df['Line Items']:
                 for item in line_items:
-                    items_list.append((item['name'], item.get('quantity', 1)))
+                    items_list.append((
+                        item.get('product_id', None),       # Item ID
+                        item.get('variation_id', None),     # Variation ID
+                        item.get('name', ''),               # Item Name
+                        item.get('quantity', 1)             # Quantity
+                    ))
 
-            summary_df = pd.DataFrame(items_list, columns=['Item Name', 'Quantity'])
-            summary_df = summary_df.groupby('Item Name', as_index=False).sum()
-            summary_df = summary_df.sort_values('Item Name')
+            summary_df = pd.DataFrame(items_list, columns=['Item ID', 'Variation ID', 'Item Name', 'Quantity'])
+            summary_df = summary_df.groupby(['Item ID', 'Variation ID', 'Item Name'], as_index=False).sum()
+            summary_df = summary_df.sort_values(['Item ID', 'Variation ID', 'Item Name'])
 
             summary_df.to_excel(writer, index=False, sheet_name='Item Summary')
             worksheet2 = writer.sheets['Item Summary']
