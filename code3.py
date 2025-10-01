@@ -106,7 +106,7 @@ def run():
             with st.spinner("Fetching orders from WooCommerce..."):
                 while True:
                     response = requests.get(
-                        f"{WC_API_URL}/orders",
+                        f"{WC_API_URL}/wp-json/wc/v3/orders",
                         params={
                             "after": start_iso,
                             "before": end_iso,
