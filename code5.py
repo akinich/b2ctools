@@ -1,4 +1,4 @@
-TOOL_NAME = "WooCommerce → Accounting Export Tool"
+TOOL_NAME = "WooCommerce All Products Downloader"
 
 def run():
     import streamlit as st
@@ -25,7 +25,7 @@ def run():
                     params={
                         "per_page": 100,
                         "page": page,
-                        "status": "any",
+                        "status": "any",  # include drafts, pending, published, etc.
                         "order": "asc",
                         "orderby": "id"
                     },
@@ -41,6 +41,7 @@ def run():
                     break
 
                 for p in products:
+                    # Base product info
                     base_info = {
                         "ID": p.get("id"),
                         "Parent ID": None,
