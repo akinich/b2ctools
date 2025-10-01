@@ -1,6 +1,3 @@
-Here’s your code with corrected indentation (Python):
-
-```python
 import streamlit as st
 import requests
 import pandas as pd
