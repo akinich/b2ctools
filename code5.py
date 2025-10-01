@@ -186,4 +186,3 @@ def run():
                 )
             else:
                 st.info("No products found.")
-```
