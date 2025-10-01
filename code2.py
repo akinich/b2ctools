@@ -6,7 +6,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from io import BytesIO
 
 
-TOOL_NAME = "Label Generator"
+TOOL_NAME = "Shipping Label Generator"
 
 def run():
     # === DEFAULT CONSTANTS ===
