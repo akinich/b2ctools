@@ -5,4 +5,4 @@ openpyxl
 xlsxwriter
 python-dateutil
 reportlab
-PyPDF2>=3.0.0
+PyPDF2
