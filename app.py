@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
 import traceback
+import re
 
 # Configuration constants
 MODULE_PATTERN_PREFIX = 'code'
@@ -23,6 +24,29 @@ DEFAULT_TOOL_ORDER = 999
 
 # Set page config (must be first Streamlit command)
 st.set_page_config(page_title="Multi-Tool Dashboard", layout="wide")
+
+
+def extract_code_number(filename: str) -> int:
+    """
+    Extract the numeric part from a code filename.
+    
+    Args:
+        filename: The filename (e.g., 'code1.py', 'code_tool_2.py')
+    
+    Returns:
+        The extracted number, or 999999 if no number found (sorts to end)
+    
+    Examples:
+        'code1.py' -> 1
+        'code10.py' -> 10
+        'code_app_5.py' -> 5
+        'code.py' -> 999999
+    """
+    # Look for digits immediately after 'code' prefix
+    match = re.search(r'code(\d+)', filename)
+    if match:
+        return int(match.group(1))
+    return 999999  # No number found, sort to end
 
 
 @st.cache_resource
@@ -79,7 +103,8 @@ def discover_and_load_modules() -> Tuple[Dict[str, Any], List[str]]:
                 'module': module_instance,
                 'description': description,
                 'order': order,
-                'file': file
+                'file': file,
+                'code_number': extract_code_number(file)
             }
             
         except Exception as e:
@@ -89,9 +114,9 @@ def discover_and_load_modules() -> Tuple[Dict[str, Any], List[str]]:
             print(f"\nError loading {module_name}:")
             traceback.print_exc()
     
-    # Sort modules by order, then by name
+    # Sort modules by code number (from filename), then by TOOL_ORDER, then by name
     sorted_modules = dict(
-        sorted(modules.items(), key=lambda x: (x[1]['order'], x[0]))
+        sorted(modules.items(), key=lambda x: (x[1]['code_number'], x[1]['order'], x[0]))
     )
     
     return sorted_modules, errors
@@ -161,6 +186,7 @@ def main():
         # Show module info in expander
         with st.sidebar.expander("ℹ️ Module Info"):
             st.text(f"File: {modules[app_mode]['file']}")
+            st.text(f"Code #: {modules[app_mode]['code_number']}")
             st.text(f"Order: {modules[app_mode]['order']}")
         
         # Run the selected module
