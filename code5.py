@@ -4,7 +4,7 @@ import pandas as pd
 from io import BytesIO
 
 
-TOOL_NAME = "WooCommerce All Products Downloader"
+TOOL_NAME = "All Products Downloader"
 
 def run():
 
